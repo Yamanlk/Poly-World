@@ -4,36 +4,26 @@ using UnityEngine;
 
 public class GoalAnim : MonoBehaviour {
 
-    public bool traniner = false;
-
     GameManger gm;
 
-    public int fadeOutHieght;
-    public int fadeInHieght;
+    public int fadeOutHieght;                   //Start and end position of the block.
+    public int fadeInHieght;                    //Were the block will land befor fading out.                    
     [Space]
-    public float totalFadeFrames;
-    public float totalFadeTime;
+    public float totalFadeFrames;               //How many frames to fade in / out.
+    public float totalFadeTime;                 //Time in secondes to fade in / out.
 
-    float frameFadeValue;
-    float frameFadeTime;
+    private float fStep;                        //The value that need to be added to the position at each step.
+
     [Space]
-    public float delayTimeRange;
-    float delayTime;
-
-
-    float currValue = 1;
+    public float delayTimeRange;                
+    private float delayTime;
 
     void Start(){
         gm = GameObject.Find("GameManger").GetComponent<GameManger>();
         transform.position = new Vector3(transform.parent.position.x, fadeOutHieght, transform.parent.position.z);
         delayTime = Random.Range(0, delayTimeRange);
-        frameFadeTime = totalFadeTime / totalFadeFrames;
-        frameFadeValue = 1 / totalFadeFrames;
         StartCoroutine(FadeIn());
-        if (!traniner)
-        {
-            StartCoroutine(FadeOut());
-        }
+        fStep = (fadeOutHieght - fadeInHieght) / totalFadeFrames;
     }
 
 
@@ -44,22 +34,23 @@ public class GoalAnim : MonoBehaviour {
             transform.GetChild(i).GetComponent<MeshRenderer>().material.color = new Color(col.r, col.g, col.b, 0);
         }
         yield return new WaitForSeconds(delayTime + 1);
-        while (transform.GetChild(transform.childCount - 1).GetComponent<MeshRenderer>().material.color.a < 1)
+        for (int i = 0; i < totalFadeFrames; i++)
         {
-            Fade(frameFadeValue);
-            Appearance(false,-frameFadeValue);
-            yield return new WaitForSeconds(frameFadeTime);
+            Fade(1/totalFadeFrames);
+            Appearance(false, -fStep);
+            yield return new WaitForSeconds(totalFadeTime / totalFadeFrames);
         }
+        StartCoroutine(FadeOut());
     }
 
     public IEnumerator FadeOut(){
         yield return new WaitForSeconds(delayTime + gm.waitTime);
         StopCoroutine(FadeIn());
-        while (transform.GetChild(transform.childCount - 1).GetComponent<MeshRenderer>().material.color.a > 0)
+        for (int i = 0; i < totalFadeFrames; i++)
         {
-            Fade(-frameFadeValue);
-            Appearance(true,frameFadeValue);
-            yield return new WaitForSeconds(frameFadeTime);
+            Fade(1 / totalFadeFrames);
+            Appearance(true, fStep);
+            yield return new WaitForSeconds(totalFadeTime / totalFadeFrames);
         }
         Destroy(this.gameObject,1);
     }
@@ -73,14 +64,13 @@ public class GoalAnim : MonoBehaviour {
     }
 
     void Appearance(bool isOut, float valu){
-        currValue += valu;
         if (isOut)
         {
-            transform.position = new Vector3(transform.position.x, Mathf.Lerp(fadeInHieght,fadeOutHieght,currValue),transform.position.z);
+            transform.position = new Vector3(transform.position.x, transform.position.y + valu, transform.position.z);
         } 
         else
         {
-            transform.position = new Vector3(transform.position.x, Mathf.Lerp(fadeInHieght,fadeOutHieght,currValue),transform.position.z);
+            transform.position = new Vector3(transform.position.x, transform.position.y + valu, transform.position.z);
         }
     }
 }

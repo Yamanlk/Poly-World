@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEditor.SceneManagement;
 
 
-public class LevelEditer : EditorWindow {
+public class LevelEditor : EditorWindow {
 
 
     public GameObject playingMusic;
@@ -20,10 +20,10 @@ public class LevelEditer : EditorWindow {
 
     public bool isLastLevel;
 
-    [MenuItem("Window/LevelEditer")]
+    [MenuItem("Window/LevelEditor")]
     public static void ShowWindow()
     {
-        GetWindow<LevelEditer>("LevelEditer");
+        GetWindow<LevelEditor>("LevelEditor");
     }
 
     void OnGUI(){
